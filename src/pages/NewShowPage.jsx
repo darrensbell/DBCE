@@ -28,8 +28,8 @@ function NewShowPage() {
       if (showErr) throw showErr;
       const newShowId = newShow.id;
 
-      // 2. Fetch all budget categories from the correct table
-      const { data: categories, error: categoriesErr } = await supabase.from('dbce_categories').select('id');
+      // 2. Fetch all budget categories
+      const { data: categories, error: categoriesErr } = await supabase.from('dbce_budget_categories').select('id');
       if (categoriesErr) throw categoriesErr;
 
       // 3. Create the budget for the new show
@@ -45,8 +45,7 @@ function NewShowPage() {
       // 4. Create line items for each category
       const lineItems = categories.map(category => ({
         budget_id: newBudgetId,
-        category_id: category.id, // Correct column name
-        line_item_amount: 0, // Default to 0
+        budget_category_id: category.id,
       }));
 
       const { error: lineItemsErr } = await supabase.from('dbce_budget_line_items').insert(lineItems);
@@ -57,7 +56,28 @@ function NewShowPage() {
 
     } catch (err) {
       logError(err, 'Error creating new show and budget');
-      setError('Failed to create the show. Please check the details and try again.');
+      
+      let errorMessage = 'An unknown error occurred.';
+      if (typeof err === 'object' && err !== null) {
+        // Handle PostgrestError from Supabase, which has a specific structure
+        if (err.message && err.details) {
+            errorMessage = `Database Error: ${err.message}\nDetails: ${err.details}\nHint: ${err.hint || 'No hint provided.'}`;
+        }
+        // Handle a generic JavaScript Error object
+        else if (err.message) {
+            errorMessage = `Error: ${err.message}`;
+        }
+        // Fallback for any other type of object
+        else {
+            errorMessage = `An unexpected error object was caught. Full details:\n${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
+        }
+      } else {
+        // Handle non-object errors (e.g., a string was thrown)
+        errorMessage = `An unexpected error was caught: ${err}`;
+      }
+      
+      setError(`Failed to create the show. Please see the details below:\n\n${errorMessage}`);
+
     } finally {
       setLoading(false);
     }
@@ -67,7 +87,7 @@ function NewShowPage() {
     <div className="card">
       <h2>Create a New Show</h2>
       <form onSubmit={handleSubmit}>
-        {error && <p className="error-message">{error}</p>}
+        {error && <pre className="error-message">{error}</pre>}
         <div className="form-group">
           <label>Show Name</label>
           <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} required />
@@ -88,13 +108,6 @@ function NewShowPage() {
           {loading ? 'Creating Show...' : 'Create Show'}
         </button>
       </form>
-
-      <style jsx>{`
-        .error-message {
-          color: red;
-          margin-bottom: 1rem;
-        }
-      `}</style>
     </div>
   );
 }
