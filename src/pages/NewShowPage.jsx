@@ -1,94 +1,100 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { logError } from '../utils/logger';
 
 function NewShowPage() {
   const [showName, setShowName] = useState('');
   const [showDate, setShowDate] = useState('');
-  const [plannedPerformances, setPlannedPerformances] = useState('');
+  const [plannedPerformances, setPlannedPerformances] = useState(1);
   const [venue, setVenue] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { data: show, error } = await supabase
-      .from('dbce_shows')
-      .insert([{ show_name: showName, show_date: showDate, planned_performances: plannedPerformances, venue: venue }])
-      .select();
+    setLoading(true);
+    setError(null);
 
-    if (error) {
-      console.error('Error creating show:', error);
-    } else {
-        if (show && show.length > 0) {
-            const newShowId = show[0].id;
+    try {
+      // 1. Create the new show
+      const { data: newShow, error: showErr } = await supabase
+        .from('dbce_shows')
+        .insert([{ show_name: showName, show_date: showDate, planned_performances: plannedPerformances, venue: venue }])
+        .select()
+        .single();
 
-            const { data: categories, error: categoriesError } = await supabase
-            .from('dbce_budget_categories')
-            .select('*');
+      if (showErr) throw showErr;
+      const newShowId = newShow.id;
 
-            if (categoriesError) {
-                console.error('Error fetching budget categories:', categoriesError);
-                return;
-            }
+      // 2. Fetch all budget categories from the correct table
+      const { data: categories, error: categoriesErr } = await supabase.from('dbce_categories').select('id');
+      if (categoriesErr) throw categoriesErr;
 
-            const { data: budget, error: budgetError } = await supabase
-            .from('dbce_budgets')
-            .insert([{ show_id: newShowId, budget_name: `${showName} Budget` }])
-            .select();
+      // 3. Create the budget for the new show
+      const { data: budget, error: budgetErr } = await supabase
+        .from('dbce_budgets')
+        .insert([{ show_id: newShowId, budget_name: `${showName} Budget` }])
+        .select()
+        .single();
+      
+      if (budgetErr) throw budgetErr;
+      const newBudgetId = budget.id;
 
-            if (budgetError) {
-                console.error('Error creating budget:', budgetError);
-                return;
-            }
+      // 4. Create line items for each category
+      const lineItems = categories.map(category => ({
+        budget_id: newBudgetId,
+        category_id: category.id, // Correct column name
+        line_item_amount: 0, // Default to 0
+      }));
 
-            if (budget && budget.length > 0) {
-                const newBudgetId = budget[0].id;
+      const { error: lineItemsErr } = await supabase.from('dbce_budget_line_items').insert(lineItems);
+      if (lineItemsErr) throw lineItemsErr;
 
-                const lineItems = categories.map(category => ({
-                    budget_id: newBudgetId,
-                    budget_category_id: category.id,
-                }));
+      // 5. Navigate to the new show's homepage
+      navigate(`/shows/${newShowId}`);
 
-                const { error: lineItemsError } = await supabase
-                    .from('dbce_budget_line_items')
-                    .insert(lineItems);
-
-                if (lineItemsError) {
-                    console.error('Error creating budget line items:', lineItemsError);
-                } else {
-                    navigate(`/shows/${newShowId}`);
-                }
-            } else {
-                console.error('Budget data is null or empty.');
-            }
-        } else {
-            console.error('Show data is null or empty.');
-        }
+    } catch (err) {
+      logError(err, 'Error creating new show and budget');
+      setError('Failed to create the show. Please check the details and try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Create New Show</h1>
+    <div className="card">
+      <h2>Create a New Show</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        {error && <p className="error-message">{error}</p>}
+        <div className="form-group">
           <label>Show Name</label>
           <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} required />
         </div>
-        <div>
+        <div className="form-group">
           <label>Show Date</label>
-          <input type="date" value={showDate} onChange={(e) => setShowDate(e.target.value)} />
+          <input type="date" value={showDate} onChange={(e) => setShowDate(e.target.value)} required />
         </div>
-        <div>
+        <div className="form-group">
           <label>Planned Performances</label>
-          <input type="number" value={plannedPerformances} onChange={(e) => setPlannedPerformances(e.target.value)} />
+          <input type="number" value={plannedPerformances} onChange={(e) => setPlannedPerformances(e.target.value)} min="1" required />
         </div>
-        <div>
+        <div className="form-group">
           <label>Venue</label>
-          <input type="text" value={venue} onChange={(e) => setVenue(e.target.value)} />
+          <input type="text" value={venue} onChange={(e) => setVenue(e.target.value)} required />
         </div>
-        <button type="submit">Create Show</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Creating Show...' : 'Create Show'}
+        </button>
       </form>
+
+      <style jsx>{`
+        .error-message {
+          color: red;
+          margin-bottom: 1rem;
+        }
+      `}</style>
     </div>
   );
 }

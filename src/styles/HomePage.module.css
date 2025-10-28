@@ -1,0 +1,28 @@
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.newShowCardContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  border: 2px dashed #1abc9c;
+  border-radius: 8px; /* Match the card's border-radius */
+  padding: 20px;
+}
+
+.plusIcon {
+  font-size: 3rem;
+  color: #1abc9c;
+  line-height: 1;
+}
+
+.newShowCardContent h3 {
+    margin: 10px 0 0 0;
+    color: #1abc9c;
+}

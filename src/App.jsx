@@ -1,23 +1,33 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 import NewShowPage from './pages/NewShowPage';
-import ExistingShowsPage from './pages/ExistingShowsPage';
-import ShowHomepage from './pages/ShowHomepage';
-import NewBudgetPage from './pages/NewBudgetPage';
+import ShowHomepage from './pages/ShowHomepage'; // Corrected import
 import BudgetPage from './pages/BudgetPage';
+import './styles/global.css'; // Ensure this is imported
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/shows/new" element={<NewShowPage />} />
-        <Route path="/shows" element={<ExistingShowsPage />} />
-        <Route path="/shows/:showId" element={<ShowHomepage />} />
-        <Route path="/shows/:showId/budgets/new" element={<NewBudgetPage />} />
-        <Route path="/budgets/:budgetId" element={<BudgetPage />} />
-      </Routes>
+      <div className="app-container">
+        <nav className="sidebar">
+          <div className="sidebar-header">
+            <h2>Show Manager</h2>
+          </div>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/new-show">Create New Show</Link></li>
+          </ul>
+        </nav>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/new-show" element={<NewShowPage />} />
+            <Route path="/shows/:showId" element={<ShowHomepage />} /> {/* Corrected component */}
+            <Route path="/budgets/:budgetId" element={<BudgetPage />} />
+          </Routes>
+        </main>
+      </div>
     </Router>
   );
 }

@@ -1,0 +1,79 @@
+.budgetPage .card {
+  margin-bottom: 20px;
+}
+
+.errorTitle {
+  color: #e74c3c;
+}
+
+.warning {
+  background-color: #f39c12;
+  color: white;
+}
+
+.summaryGroup {
+  padding: 20px;
+}
+
+.summaryTitle {
+  color: #16a085;
+  border-bottom: 2px solid #1abc9c;
+  padding-bottom: 10px;
+}
+
+.department {
+  margin-left: 20px;
+  margin-top: 15px;
+}
+
+.department h3 {
+  color: #2980b9;
+}
+
+.subDepartment {
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.subDepartment h4 {
+  color: #8e44ad;
+}
+
+.tableContainer {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+}
+
+table tr:nth-of-type(even) {
+  background-color: #f9f9f9;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #1abc9c;
+  outline: none;
+}
