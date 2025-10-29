@@ -31,14 +31,17 @@ function NewBudgetPage() {
       // Step 2: Fetch all budget categories
       const { data: categories, error: categoriesError } = await supabase
         .from('dbce_budget_categories')
-        .select('id');
+        .select('*');
       
       if (categoriesError) throw categoriesError;
 
       // Step 3: Create a line item for each category
       const lineItemsToInsert = categories.map(category => ({
         budget_id: newBudgetId,
-        category_id: category.id,
+        summary_group: category.summary_group,
+        department: category.department,
+        sub_department: category.sub_department,
+        line_item: category.line_item,
         quantity: 0,
         rate_gbp: 0,
         total_gbp: 0,

@@ -1,12 +1,10 @@
-# Show Manager Application Blueprint
+# TheatreBudget Application Blueprint
 
 ## Overview
 
-A simple yet powerful application to help users manage their shows. It provides functionalities to create new shows and browse through existing ones. The application is built with React and Vite and uses `react-router-dom` for navigation. It connects to a Supabase database for live data, including shows, budgets, and budget line items. The application now features a modern, card-based design with a global stylesheet for a consistent look and feel.
+A simple yet powerful application to help users manage their theatre production budgets. The application, now named **TheatreBudget**, provides functionalities to create new shows and browse through existing ones. It is built with React and Vite and uses `react-router-dom` for navigation. The application features a global sidebar with a home button and a database connection status indicator. It connects to a Supabase database for live data, including shows, budgets, and budget line items. The application now features a modern, card-based design with a global stylesheet for a consistent look and feel.
 
-## Database Schema (Authoritative)
-
-This schema is automatically fetched from the Supabase database and serves as the single source of truth for all database operations.
+## Database Schema
 
 ### `dbce_shows`
 
@@ -32,6 +30,8 @@ This schema is automatically fetched from the Supabase database and serves as th
 
 ### `dbce_budget_categories`
 
+This table serves as a template for creating new budgets.
+
 | Column         | Type        |
 |----------------|-------------|
 | `id`           | `int4`      |
@@ -49,15 +49,18 @@ This schema is automatically fetched from the Supabase database and serves as th
 |---------------------|------------------|
 | `id`                | `int4`           |
 | `budget_id`         | `int4`           |
-| `budget_category_id`| `int4`           |
-| `number_of_items`   | `int4`           |
-| `quantity`          | `int4`           |
+| `summary_group`     | `text`           |
+| `department`        | `text`           |
+| `sub_department`    | `text`           |
+| `line_item`         | `text`           |
+| `number_of_items`   | `numeric`        |
+| `quantity`          | `numeric`        |
 | `rate_type`         | `dbce_rate_type` |
 | `rate_gbp`          | `numeric`        |
 | `total_gbp`         | `numeric`        |
 | `notes`             | `text`           |
-| `date_added`        | `timestamptz`    |
-| `date_changed`      | `timestamptz`    |
+| `created_at`        | `timestamptz`    |
+| `updated_at`      | `timestamptz`    |
 
 ## Project Outline
 
@@ -65,30 +68,25 @@ This schema is automatically fetched from the Supabase database and serves as th
 *   **Routing:** `react-router-dom`
 *   **Database:** Supabase
 *   **Styling:** Global CSS, CSS Modules
-*   **Component Library:** Handsontable for spreadsheet views.
 
 ## Version History
 
+### Version 1.3.0
+
+*   **Feature:** Renamed the application to "TheatreBudget".
+*   **Feature:** Added a global sidebar with a "Home" button for easy navigation and a database connection status indicator.
+*   **Feature:** The total budget cost is now prominently displayed at the top of the budget page.
+*   **Feature:** The show's venue is now displayed under the budget title for better context.
+*   **Enhancement:** Improved the main landing page with a clear title and a welcoming message.
+
+### Version 1.2.0
+
+*   **Feature:** Major UI/UX overhaul for the budget page, including a more compact and streamlined table layout, optimized column widths, and a "Saving..." indicator for auto-saves.
+*   **Feature:** Added `number_of_items` field to the budget table and calculations.
+*   **Fix:** Resolved a critical bug preventing line item edits from being saved correctly.
+*   **Fix:** Corrected data type mismatches for numeric inputs.
+*   **Enhancement:** Improved user experience for empty budgets and allowed decimal inputs for financial values.
+
 ### Version 1.1.1
 
-*   **Feature:** Implemented Git versioning and pushed the initial stable version to GitHub.
-*   **Fix:** Resolved a critical bug where budget creation failed silently. The root cause was a Row Level Security (RLS) policy on the `dbce_budget_categories` table that prevented the application from fetching the necessary category data. This led to shows being created with empty budgets. The user removed the RLS policy, which resolved the issue.
-
-## Current Plan: Interactive Budget Spreadsheet
-
-**Goal:** To replace the static budget table on the `BudgetPage` with a dynamic, Excel-style spreadsheet grid using the Handsontable library.
-
-**Key Features:**
-
-*   Display budget line items in a familiar spreadsheet interface.
-*   Allow inline editing of the 'Quantity', 'Rate', and 'Notes' fields.
-*   Automatically recalculate the 'Total' column when 'Quantity' or 'Rate' changes.
-*   Save any edits back to the Supabase database in real-time.
-
-**Action Items:**
-
-1.  **Install Dependencies:** Install `@handsontable/react` and `handsontable` via npm.
-2.  **Refactor BudgetPage.jsx:** Replace the existing HTML table with the `<HotTable>` component.
-3.  **Configure Spreadsheet:** Set up the columns, data binding, and define which columns are editable.
-4.  **Implement Auto-Save:** Create a function that listens for cell changes and triggers an update to the `dbce_budget_line_items` table in Supabase.
-5.  **Style the Grid:** Import the Handsontable CSS to ensure the grid has a clean, professional appearance.
+*   **Fix:** Resolved a critical bug where budget creation failed silently due to a Supabase Row Level Security policy.

@@ -1,32 +1,30 @@
 .showHomepage {
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 20px;
 }
 
 .headerCard {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 20px;
 }
 
 .createButton {
-  background-color: #1abc9c;
+  background-color: #4CAF50; /* A nice green */
   color: white;
   padding: 10px 20px;
-  border-radius: 5px;
   text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .createButton:hover {
-  background-color: #16a085;
+  background-color: #45a049;
 }
 
 .showGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
 }
 
@@ -36,20 +34,20 @@
 }
 
 .showCard {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .showCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.showCard h2 {
-  color: #2980b9;
-  margin-bottom: 1rem;
+.noShowsCard {
+  text-align: center;
+  padding: 40px;
 }
 
-.showCard p {
-  margin: 0.5rem 0;
+.noShowsCard .createButton {
+  margin-top: 20px;
+  display: inline-block;
 }

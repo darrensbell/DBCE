@@ -43,9 +43,10 @@ function ShowHomepage() {
       </div>
 
       {shows.length === 0 ? (
-        <div className="card">
+        <div className={`card ${styles.noShowsCard}`}>
           <h2>No shows found.</h2>
           <p>Get started by creating a new show.</p>
+          <Link to="/shows/new" className={styles.createButton}>Create New Show</Link>
         </div>
       ) : (
         <div className={styles.showGrid}>

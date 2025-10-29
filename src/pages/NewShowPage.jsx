@@ -42,7 +42,7 @@ function NewShowPage() {
       if (budgetErr) throw budgetErr;
       const newBudgetId = budget.id;
 
-      // 4. Create line items for each category with all required fields and correct defaults
+      // 4. Create line items for each category by copying category data
       const lineItems = categories.map(category => {
         const defaultRate = 0;
         const defaultQuantity = 1;
@@ -50,12 +50,15 @@ function NewShowPage() {
         
         return {
           budget_id: newBudgetId,
-          budget_category_id: category.id,
+          summary_group: category.summary_group,
+          department: category.department,
+          sub_department: category.sub_department,
+          line_item: category.line_item,
           number_of_items: defaultNumberOfItems,
           quantity: defaultQuantity,
-          rate_type: 'allowance', // Correct default as per user instruction
+          rate_type: 'allowance',
           rate_gbp: defaultRate,
-          total_gbp: defaultNumberOfItems * defaultQuantity * defaultRate, // Correct calculation
+          total_gbp: defaultNumberOfItems * defaultQuantity * defaultRate,
           date_added: new Date().toISOString(),
           date_changed: new Date().toISOString(),
         };
@@ -74,21 +77,16 @@ function NewShowPage() {
       if (typeof err === 'object' && err !== null) {
         if (err.message) {
             errorMessage = `Database Error: ${err.message}`;
-            if (err.details) errorMessage += `
-Details: ${err.details}`;
-            if (err.hint) errorMessage += `
-Hint: ${err.hint}`;
+            if (err.details) errorMessage += `\nDetails: ${err.details}`;
+            if (err.hint) errorMessage += `\nHint: ${err.hint}`;
         } else {
-            errorMessage = `An unexpected error object was caught. Full details:
-${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
+            errorMessage = `An unexpected error object was caught. Full details:\n${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
         }
       } else {
         errorMessage = `An unexpected error was caught: ${err}`;
       }
       
-      setError(`Failed to create the show. Please see the details below:
-
-${errorMessage}`);
+      setError(`Failed to create the show. Please see the details below:\n\n${errorMessage}`);
 
     } finally {
       setLoading(false);

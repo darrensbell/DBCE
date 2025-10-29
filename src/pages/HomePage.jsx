@@ -5,11 +5,10 @@ function HomePage() {
 
   return (
     <div className="card">
-      <h1>Welcome to the Show Manager</h1>
-      <p>This is your central hub for managing show productions and budgets.</p>
+      <h1>Welcome to TheatreBudget</h1>
+      <p>Your all-in-one solution for managing theatre production budgets.</p>
       <div className="home-actions">
-        <Link to="/new-show" className="button">Create a New Show</Link>
-        {/* <Link to="/existing-shows" className="button">View Existing Shows</Link> */}
+        <Link to="/shows" className="button">Get Started</Link>
       </div>
     </div>
   );
