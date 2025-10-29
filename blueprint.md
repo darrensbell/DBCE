@@ -100,6 +100,10 @@ By adhering to these guidelines, we can ensure the stability and reliability of 
 
 ## Version History
 
+### Version 1.4.0
+
+*   **Fixed:** The "Total" column in the budget table now correctly and permanently maintains its right-aligned text formatting. The root cause was a flaw in the component's rendering logic that incorrectly removed the required CSS class during updates. This has been resolved, ensuring the alignment is consistent and stable.
+
 ### Version 1.3.0
 
 *   **Feature:** Renamed the application to "TheatreBudget".
