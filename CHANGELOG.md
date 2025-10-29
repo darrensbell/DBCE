@@ -1,3 +1,9 @@
+## Version 1.4.0
+
+**This version addresses a critical and persistent bug related to the styling of the budget table.**
+
+*   **Fixed:** The "Total" column in the budget table now correctly and permanently maintains its right-aligned text formatting. The root cause was a flaw in the component's rendering logic that incorrectly removed the required CSS class during updates. This has been resolved, ensuring the alignment is consistent and stable.
+
 ## Version 1.2.0
 
 **This version introduces significant UI/UX enhancements and critical bug fixes for the budget management page.**

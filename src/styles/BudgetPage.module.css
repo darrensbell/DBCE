@@ -1,10 +1,22 @@
-.budgetPage { padding: 20px; }
-.budgetGroup { margin-bottom: 20px; }
+/* src/styles/BudgetPage.module.css */
+
+.budgetPage {
+    padding: 1.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px; /* Consistent base font size */
+}
 
 .mainHeader {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.venueName {
+    font-size: 1rem;
+    color: #555;
+    margin: 0;
 }
 
 .headerTotals {
@@ -12,146 +24,184 @@
 }
 
 .totalBudget {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0 0 5px 0;
-}
-
-.venueName {
-    font-size: 0.9rem;
-    color: #888;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #222;
     margin: 0;
-    font-style: italic;
 }
 
 .savingIndicator {
-    font-style: italic;
-    color: #888;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    color: #007bff;
+    height: 1em;
+}
+
+.errorText {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.budgetGroup {
+    margin-bottom: 2rem;
 }
 
 .subGroupHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f7f7f7;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
 }
 
-.subGroupTitle { font-size: 1.3rem; color: #333; }
+.subGroupTitle {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
 .subGroupActions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1rem;
 }
-.subGroupSubtotal { font-size: 1.1rem; font-weight: bold; margin: 0; }
+
+.subGroupSubtotal {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.addButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.addButton:hover {
+    background-color: #0056b3;
+}
 
 .lineItemsTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-  table-layout: fixed;
+    width: 100%;
+    table-layout: fixed; /* Key for controlling column widths */
+    border-collapse: collapse;
+    border: 1px solid #e0e0e0;
 }
 
 .lineItemsTable th,
 .lineItemsTable td {
-  border: 1px solid #ddd;
-  padding: 4px 8px;
-  text-align: left;
-  vertical-align: middle;
-  word-wrap: break-word;
+    padding: 4px 8px;
+    text-align: left;
+    border: 1px solid #e0e0e0;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap; /* Prevent wrapping by default */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
 }
 
 .lineItemsTable th {
-  background-color: #f2f2f2;
+    font-weight: 600;
+    background-color: #f0f0f0;
+    color: #333;
 }
 
-/* Set column widths */
-.lineItemsTable th:nth-child(1), .lineItemsTable td:nth-child(1) { width: 15%; } /* Department */
-.lineItemsTable th:nth-child(2), .lineItemsTable td:nth-child(2) { width: 35%; } /* Description */
-.lineItemsTable th:nth-child(3), .lineItemsTable td:nth-child(3) { width: 8%; }  /* Number */
-.lineItemsTable th:nth-child(4), .lineItemsTable td:nth-child(4) { width: 8%; }  /* Quantity */
-.lineItemsTable th:nth-child(5), .lineItemsTable td:nth-child(5) { width: 10%; } /* Type */
-.lineItemsTable th:nth-child(6), .lineItemsTable td:nth-child(6) { width: 10%; } /* Rate */
-.lineItemsTable th:nth-child(7), .lineItemsTable td:nth-child(7) { width: 10%; } /* Total */
-.lineItemsTable th:nth-child(8), .lineItemsTable td:nth-child(8) { width: 4%; }  /* Actions */
+/* Set specific column widths */
+.departmentColumn { width: 15%; }
+.descriptionColumn { width: 30%; }
+.numberColumn { width: 8%; text-align: center; }
+.quantityColumn { width: 8%; text-align: center; }
+.typeColumn { width: 10%; }
+.rateColumn { width: 10%; text-align: right; }
+.totalColumn { width: 12%; text-align: right; }
+.actionHeader { width: 40px; }
+
 
 .inputField {
-  width: 100%;
-  padding: 4px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  box-sizing: border-box;
-  background-color: transparent;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-  font-size: inherit;
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background-color: transparent;
+    font-size: inherit;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .inputField:focus {
-  border-color: #4CAF50;
-  background-color: #f9f9f9;
-  outline: none;
+    outline: none;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px #007bff;
 }
 
+.numericInput {
+    text-align: right;
+    width: 100%;
+}
+
+.numericInput.center {
+    text-align: center;
+}
+
+/* Hide arrows from number inputs */
 .numericInput::-webkit-outer-spin-button,
 .numericInput::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.numericInput { -moz-appearance: textfield; }
+.numericInput {
+    -moz-appearance: textfield; /* Firefox */
+}
 
-.actionCell { text-align: center; }
+
+.actionCell {
+    text-align: center;
+}
 
 .deleteButton {
-  background: none;
-  border: none;
-  color: #f44336;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
+    background: none;
+    border: none;
+    color: #e65252;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
 }
 
-.deleteButton:hover { opacity: 1; }
-
-.addButton {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  background-color: #008CBA;
-  color: white;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
+.deleteButton:hover {
+    color: #fff;
+    background-color: #dc3545;
 }
-
-.addButton:hover { background-color: #007B-A5; }
-
-.errorTitle { color: #f44336; }
-.errorText { color: #f44336; font-weight: bold; margin-top: 10px; }
 
 /* Modal Styles */
-.modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modalContent { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
-.modalContent h2 { margin-top: 0; margin-bottom: 20px; }
-.formGroup { margin-bottom: 15px; }
-.formGroup label { display: block; margin-bottom: 8px; font-weight: bold; }
-.formGroup input, .formGroup select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-.formGroup select[disabled] { background-color: #f3f3f3; }
-.modalActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-
-.confirmButton, .cancelButton {
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.confirmButton { background-color: #4CAF50; color: white; }
-.cancelButton { background-color: #f0f0f0; color: #333; }
+.modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modalContent { background: white; padding: 2rem; border-radius: 6px; width: 90%; max-width: 480px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.modalContent h2 { margin-top: 0; margin-bottom: 1.5rem; font-size: 1.4rem; }
+.formGroup { margin-bottom: 1rem; }
+.formGroup label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
+.formGroup select, .formGroup input { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+.modalActions { margin-top: 2rem; display: flex; justify-content: flex-end; gap: 0.75rem; }
+.confirmButton, .cancelButton { padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: background-color 0.2s, box-shadow 0.2s; }
+.confirmButton { background-color: #28a745; color: white; }
+.confirmButton:hover { background-color: #218838; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.cancelButton { background-color: #6c757d; color: white; }
+.cancelButton:hover { background-color: #5a6268; }

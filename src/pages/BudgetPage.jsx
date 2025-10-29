@@ -4,7 +4,21 @@ import { supabase } from '../supabaseClient';
 import { logError } from '../utils/logger';
 import styles from '../styles/BudgetPage.module.css';
 
-const currencyFormatter = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+// Formatter for currency with decimals (for Rate)
+const currencyFormatterWithDecimals = new Intl.NumberFormat('en-GB', { 
+  style: 'currency', 
+  currency: 'GBP',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+// Formatter for currency without decimals (for Total)
+const currencyFormatterNoDecimals = new Intl.NumberFormat('en-GB', { 
+  style: 'currency', 
+  currency: 'GBP',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
 
 const debounce = (func, delay) => {
   let timeout;
@@ -25,6 +39,8 @@ const BudgetPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ summaryGroup: '', department: '', subDepartment: '', lineItem: '' });
   const [allCategories, setAllCategories] = useState([]);
+
+  const rateTypes = ['Allowance', 'Fee', 'Buyout', 'Weekly', 'Daily'];
 
   const updateLineItemInDB = useCallback(async (id, dataToUpdate) => {
     setIsSaving(true);
@@ -76,10 +92,12 @@ const BudgetPage = () => {
         if (item.id === id) {
             const updatedItem = { ...item, [field]: value };
             
-            const numberOfItems = parseFloat(updatedItem.number_of_items) || 0;
-            const quantity = parseFloat(updatedItem.quantity) || 0;
-            const rate = parseFloat(updatedItem.rate_gbp) || 0;
-            updatedItem.total_gbp = numberOfItems * quantity * rate;
+            if (field !== 'line_item' && field !== 'rate_type') {
+                const numberOfItems = parseFloat(updatedItem.number_of_items) || 0;
+                const quantity = parseFloat(updatedItem.quantity) || 0;
+                const rate = parseFloat(updatedItem.rate_gbp) || 0;
+                updatedItem.total_gbp = numberOfItems * quantity * rate;
+            }
 
             return updatedItem;
         }
@@ -95,6 +113,7 @@ const BudgetPage = () => {
             number_of_items: parseFloat(itemForDB.number_of_items) || 0,
             quantity: parseFloat(itemForDB.quantity) || 0,
             rate_gbp: parseFloat(itemForDB.rate_gbp) || 0,
+            rate_type: itemForDB.rate_type,
             total_gbp: itemForDB.total_gbp,
         };
         debouncedUpdate(id, payload);
@@ -124,9 +143,6 @@ const BudgetPage = () => {
       return;
     }
 
-    const category = allCategories.find(cat => cat.department === modalData.department && cat.sub_department === modalData.subDepartment);
-    const rateType = category ? category.rate_type : 'Unit'; // Fallback
-
     try {
       const { data, error } = await supabase
         .from('dbce_budget_line_items')
@@ -140,7 +156,7 @@ const BudgetPage = () => {
             quantity: 1, 
             rate_gbp: 0, 
             total_gbp: 0,
-            rate_type: rateType
+            rate_type: 'Allowance'
         })
         .select().single();
         
@@ -230,7 +246,7 @@ const BudgetPage = () => {
                 {show && <p className={styles.venueName}>{show.venue}</p>}
             </div>
             <div className={styles.headerTotals}>
-              <h2 className={styles.totalBudget}>Total: {currencyFormatter.format(totalBudget)}</h2>
+              <h2 className={styles.totalBudget}>Total: {currencyFormatterNoDecimals.format(totalBudget)}</h2>
               {isSaving && <div className={styles.savingIndicator}>Saving...</div>}
             </div>
         </div>
@@ -251,33 +267,37 @@ const BudgetPage = () => {
             <div className={styles.subGroupHeader}>
               <h2 className={styles.subGroupTitle}>{subGroup}</h2>
               <div className={styles.subGroupActions}>
-                <h3 className={styles.subGroupSubtotal}>Subtotal: {currencyFormatter.format(subGroupData.subtotal)}</h3>
+                <h3 className={styles.subGroupSubtotal}>Subtotal: {currencyFormatterNoDecimals.format(subGroupData.subtotal)}</h3>
                  <button onClick={() => openAddLineModal(subGroup)} className={styles.addButton}>Add Line</button>
               </div>
             </div>
             <table className={styles.lineItemsTable}>
               <thead>
                 <tr>
-                  <th>Department</th>
-                  <th>Description</th>
-                  <th>Number</th>
-                  <th>Quantity</th>
-                  <th>Type</th>
-                  <th>Rate</th>
-                  <th>Total</th>
+                  <th className={styles.departmentColumn}>Department</th>
+                  <th className={styles.descriptionColumn}>Description</th>
+                  <th className={styles.numberColumn}>Number</th>
+                  <th className={styles.quantityColumn}>Quantity</th>
+                  <th className={styles.typeColumn}>Type</th>
+                  <th className={styles.rateColumn}>Rate</th>
+                  <th className={styles.totalColumn}>Total</th>
                   <th className={styles.actionHeader}></th>
                 </tr>
               </thead>
               <tbody>
                 {subGroupData.line_items.map(item => (
                   <tr key={item.id}>
-                    <td>{item.department}</td>
-                    <td><input type="text" value={item.line_item || ''} onChange={e => handleInputChange(item.id, 'line_item', e.target.value)} className={styles.inputField} /></td>
-                    <td><input type="number" step="1" value={item.number_of_items || ''} onChange={e => handleInputChange(item.id, 'number_of_items', e.target.value)} className={`${styles.inputField} ${styles.numericInput}`} /></td>
-                    <td><input type="number" step="0.01" value={item.quantity || ''} onChange={e => handleInputChange(item.id, 'quantity', e.target.value)} className={`${styles.inputField} ${styles.numericInput}`} /></td>
-                    <td>{item.rate_type}</td>
-                    <td><input type="number" step="0.01" value={item.rate_gbp || ''} onChange={e => handleInputChange(item.id, 'rate_gbp', e.target.value)} className={`${styles.inputField} ${styles.numericInput}`} /></td>
-                    <td>{currencyFormatter.format(item.total_gbp || 0)}</td>
+                    <td className={styles.departmentColumn}>{item.department}</td>
+                    <td className={styles.descriptionColumn}><input type="text" value={item.line_item || ''} onChange={e => handleInputChange(item.id, 'line_item', e.target.value)} className={styles.inputField} /></td>
+                    <td className={styles.numberColumn}><input type="number" step="1" value={item.number_of_items || ''} onChange={e => handleInputChange(item.id, 'number_of_items', e.target.value)} className={`${styles.inputField} ${styles.numericInput} ${styles.center}`} /></td>
+                    <td className={styles.quantityColumn}><input type="number" step="0.01" value={item.quantity || ''} onChange={e => handleInputChange(item.id, 'quantity', e.target.value)} className={`${styles.inputField} ${styles.numericInput} ${styles.center}`} /></td>
+                    <td className={styles.typeColumn}>
+                      <select value={item.rate_type || ''} onChange={e => handleInputChange(item.id, 'rate_type', e.target.value)} className={styles.inputField}>
+                        {rateTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                      </select>
+                    </td>
+                    <td className={styles.rateColumn}><input type="number" step="0.01" value={item.rate_gbp || ''} onChange={e => handleInputChange(item.id, 'rate_gbp', e.target.value)} className={`${styles.inputField} ${styles.numericInput}`} /></td>
+                    <td className={styles.totalColumn}>{currencyFormatterNoDecimals.format(item.total_gbp || 0)}</td>
                     <td className={styles.actionCell}>
                       <button onClick={() => handleDelete(item.id)} className={styles.deleteButton}>&times;</button>
                     </td>

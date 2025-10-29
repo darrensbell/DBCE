@@ -62,6 +62,35 @@ This table serves as a template for creating new budgets.
 | `created_at`        | `timestamptz`    |
 | `updated_at`      | `timestamptz`    |
 
+## Data Relationships and Logic
+
+This section outlines the relationships between the database tables and the logic that governs them. A clear understanding of these relationships is crucial to avoid breaking the application during refactoring or feature development.
+
+**Key Relationships**
+
+*   **`dbce_shows` to `dbce_budgets` (One-to-Many):**
+    *   Each `show` can have multiple `budgets`.
+    *   The `show_id` column in the `dbce_budgets` table is a foreign key that references the `id` column in the `dbce_shows` table.
+
+*   **`dbce_budgets` to `dbce_budget_line_items` (One-to-Many):**
+    *   Each `budget` consists of multiple `line items`.
+    *   The `budget_id` column in the `dbce_budget_line_items` table is a foreign key that references the `id` column in the `dbce_budgets` table.
+
+**Budget Creation Logic**
+
+*   **`dbce_budget_categories` as a Template:**
+    *   The `dbce_budget_categories` table is **not directly related** to the other tables via foreign keys. Instead, it serves as a **template** for creating new budgets.
+    *   When a new budget is created for a show, the application reads the data from `dbce_budget_categories` and uses it to populate the `dbce_budget_line_items` table with a default set of line items.
+    *   This design allows for a consistent starting structure for all new budgets while still allowing for customization of individual budgets.
+
+**Important Considerations for Refactoring**
+
+*   **Foreign Key Integrity:** Always ensure that the foreign key relationships described above are maintained. Any refactoring of the database interaction logic must respect these relationships.
+*   **Budget Creation Process:** When refactoring the budget creation process, remember that it relies on the `dbce_budget_categories` table as a template. Do not alter this logic without a clear understanding of the consequences.
+*   **Data Flow:** Be mindful of the data flow between components. For example, when displaying a budget, the application first retrieves the show data, then the budget data for that show, and finally the line items for that budget.
+
+By adhering to these guidelines, we can ensure the stability and reliability of the TheatreBudget application moving forward.
+
 ## Project Outline
 
 *   **Framework:** React (with Vite)
