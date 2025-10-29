@@ -106,7 +106,6 @@
 .lineItemsTable th,
 .lineItemsTable td {
     padding: 4px 8px;
-    text-align: left;
     border: 1px solid #e0e0e0;
     font-size: 13px;
     vertical-align: middle;
@@ -119,18 +118,18 @@
     font-weight: 600;
     background-color: #f0f0f0;
     color: #333;
+    text-align: left;
 }
 
-/* Set specific column widths */
-.departmentColumn { width: 15%; }
-.descriptionColumn { width: 30%; }
+/* Set specific column widths and text alignment */
+.departmentColumn { width: 15%; text-align: left; }
+.descriptionColumn { width: 30%; text-align: left; }
 .numberColumn { width: 8%; text-align: center; }
 .quantityColumn { width: 8%; text-align: center; }
-.typeColumn { width: 10%; }
+.typeColumn { width: 10%; text-align: left; }
 .rateColumn { width: 10%; text-align: right; }
 .totalColumn { width: 12%; text-align: right; }
 .actionHeader { width: 40px; }
-
 
 .inputField {
     width: 100%;
@@ -205,3 +204,15 @@
 .confirmButton:hover { background-color: #218838; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .cancelButton { background-color: #6c757d; color: white; }
 .cancelButton:hover { background-color: #5a6268; }
+
+.rateCell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align contents to the right */
+}
+
+.currencySymbol {
+    padding-right: 4px; /* Space between symbol and input */
+    font-size: inherit;
+    color: #555;
+}

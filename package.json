@@ -1,29 +1,31 @@
-{
-  "name": "myapp",
-  "private": true,
-  "version": "1.4.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.76.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-router-dom": "^6.23.1",
-    "react-data-grid": "7.0.0-beta.41"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.0.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.6",
-    "vite": "^5.2.0"
-  }
-}
+      {
+        "name": "myapp",
+        "private": true,
+        "version": "1.4.1",
+        "type": "module",
+        "scripts": {
+          "dev": "vite",
+          "build": "vite build",
+          "lint": "eslint .",
+          "preview": "vite preview"
+        },
+        "dependencies": {
+          "@supabase/supabase-js": "^2.76.1",
+          "react": "18.2.0",
+          "react-data-grid": "7.0.0-beta.41",
+          "react-dom": "18.2.0",
+          "react-router-dom": "^6.23.1"
+        },
+        "devDependencies": {
+          "@types/react": "^18.2.0",
+          "@types/react-dom": "^18.2.0",
+          "@vitejs/plugin-react": "^4.0.0",
+          "eslint": "^8.57.0",
+          "eslint-plugin-react": "^7.34.1",
+          "eslint-plugin-react-hooks": "^4.6.0",
+          "eslint-plugin-react-refresh": "^0.4.6",
+          "supabase": "^2.54.11",
+          "vite": "^5.2.0"
+        }
+      }
+      
