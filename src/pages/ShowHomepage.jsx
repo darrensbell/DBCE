@@ -1,64 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { logError } from '../utils/logger';
+import styles from '../styles/ShowHomepage.module.css';
 
 function ShowHomepage() {
-  const { showId } = useParams();
-  const [show, setShow] = useState(null);
-  const [budgets, setBudgets] = useState([]);
+  const [shows, setShows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchShow = async () => {
-      const { data, error } = await supabase
-        .from('dbce_shows')
-        .select('*')
-        .eq('id', showId)
-        .single();
+    const fetchShows = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('dbce_shows')
+          .select('*')
+          .order('show_date', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching show:', error);
-      } else {
-        setShow(data);
+        if (error) throw error;
+        setShows(data);
+      } catch (err) {
+        logError(err, 'Error fetching shows');
+        setError('Failed to fetch shows. Please try again.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchBudgets = async () => {
-      const { data, error } = await supabase
-        .from('dbce_budgets')
-        .select('*')
-        .eq('show_id', showId);
+    fetchShows();
+  }, []);
 
-      if (error) {
-        console.error('Error fetching budgets:', error);
-      } else {
-        setBudgets(data);
-      }
-    };
-
-    fetchShow();
-    fetchBudgets();
-  }, [showId]);
-
-  if (!show) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div className="card"><h2>Loading Shows...</h2></div>;
+  if (error) return <div className="card"><h2>Error</h2><p>{error}</p></div>;
 
   return (
-    <div>
-      <h1>{show.show_name}</h1>
-      <p>Date: {show.show_date}</p>
-      <p>Planned Performances: {show.planned_performances}</p>
-      <p>Venue: {show.venue}</p>
+    <div className={styles.showHomepage}>
+      <div className={`${styles.headerCard} card`}>
+        <h1>All Shows</h1>
+        <Link to="/shows/new" className={styles.createButton}>Create New Show</Link>
+      </div>
 
-      <h2>Budgets</h2>
-      <ul>
-        {budgets.map((budget) => (
-          <li key={budget.id}>
-            <Link to={`/budgets/${budget.id}`}>{budget.budget_name}</Link>
-          </li>
-        ))}
-      </ul>
-      <Link to={`/shows/${showId}/budgets/new`}>Create New Budget</Link>
+      {shows.length === 0 ? (
+        <div className="card">
+          <h2>No shows found.</h2>
+          <p>Get started by creating a new show.</p>
+        </div>
+      ) : (
+        <div className={styles.showGrid}>
+          {shows.map(show => (
+            <Link to={`/shows/${show.id}`} key={show.id} className={styles.showCardLink}>
+              <div className={`${styles.showCard} card`}>
+                <h2>{show.show_name}</h2>
+                <p><strong>Date:</strong> {show.show_date}</p>
+                <p><strong>Venue:</strong> {show.venue}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

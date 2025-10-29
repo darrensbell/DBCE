@@ -1,0 +1,55 @@
+.showHomepage {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.headerCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.createButton {
+  background-color: #1abc9c;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.createButton:hover {
+  background-color: #16a085;
+}
+
+.showGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.showCardLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.showCard {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  height: 100%;
+}
+
+.showCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.showCard h2 {
+  color: #2980b9;
+  margin-bottom: 1rem;
+}
+
+.showCard p {
+  margin: 0.5rem 0;
+}

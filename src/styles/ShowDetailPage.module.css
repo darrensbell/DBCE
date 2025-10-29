@@ -1,0 +1,62 @@
+.showDetailPage {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.showInfoCard, .budgetsCard {
+  margin-bottom: 2rem;
+}
+
+.showInfoCard h1 {
+  color: #16a085;
+}
+
+.budgetsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.budgetsHeader h2 {
+  margin: 0;
+  color: #2980b9;
+}
+
+.createButton {
+  background-color: #1abc9c;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.createButton:hover {
+  background-color: #16a085;
+}
+
+.budgetList {
+  list-style: none;
+  padding: 0;
+}
+
+.budgetList li {
+  background-color: #ecf0f1;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  transition: background-color 0.2s;
+}
+
+.budgetList li:hover {
+  background-color: #bdc3c7;
+}
+
+.budgetList li a {
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: bold;
+  display: block;
+}

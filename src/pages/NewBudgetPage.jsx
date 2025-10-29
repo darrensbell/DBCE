@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { logError } from '../utils/logger';
+import styles from '../styles/NewBudgetPage.module.css';
 
 function NewBudgetPage() {
   const { showId } = useParams();
+  const navigate = useNavigate();
   const [budgetName, setBudgetName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,92 +17,71 @@ function NewBudgetPage() {
     setError(null);
 
     try {
-      // 1. Create the new budget
-      const { data: newBudget, error: budgetErr } = await supabase
+      // Step 1: Create the new budget
+      const { data: budgetData, error: budgetError } = await supabase
         .from('dbce_budgets')
-        .insert([{ show_id: showId, budget_name: budgetName }])
+        .insert({ budget_name: budgetName, show_id: showId })
         .select()
         .single();
 
-      if (budgetErr) throw budgetErr;
-      const newBudgetId = newBudget.id;
+      if (budgetError) throw budgetError;
 
-      // 2. Fetch all standard categories
-      const { data: categories, error: categoriesErr } = await supabase
+      const newBudgetId = budgetData.id;
+
+      // Step 2: Fetch all budget categories
+      const { data: categories, error: categoriesError } = await supabase
         .from('dbce_budget_categories')
-        .select('*');
+        .select('id');
+      
+      if (categoriesError) throw categoriesError;
 
-      if (categoriesErr) throw categoriesErr;
+      // Step 3: Create a line item for each category
+      const lineItemsToInsert = categories.map(category => ({
+        budget_id: newBudgetId,
+        category_id: category.id,
+        quantity: 0,
+        rate_gbp: 0,
+        total_gbp: 0,
+      }));
 
-      // 3. Create line items for each category with all required fields and correct defaults
-      const lineItems = categories.map(category => {
-        const defaultRate = 0;
-        const defaultQuantity = 1;
-        const defaultNumberOfItems = 1;
-
-        return {
-            budget_id: newBudgetId,
-            budget_category_id: category.id,
-            number_of_items: defaultNumberOfItems,
-            quantity: defaultQuantity,
-            rate_type: 'allowance', // Correct default as per user instruction
-            rate_gbp: defaultRate,
-            total_gbp: defaultNumberOfItems * defaultQuantity * defaultRate, // Correct calculation
-            date_added: new Date().toISOString(),
-            date_changed: new Date().toISOString(),
-        };
-      });
-
-      const { error: lineItemsErr } = await supabase
+      const { error: lineItemsError } = await supabase
         .from('dbce_budget_line_items')
-        .insert(lineItems);
+        .insert(lineItemsToInsert);
 
-      if (lineItemsErr) throw lineItemsErr;
+      if (lineItemsError) throw lineItemsError;
 
-      // 4. Navigate to the new budget's page
+      // Step 4: Navigate to the new budget page
       navigate(`/budgets/${newBudgetId}`);
 
     } catch (err) {
       logError(err, 'Error creating new budget');
-      
-      let errorMessage = 'An unknown error occurred.';
-      if (typeof err === 'object' && err !== null) {
-        if (err.message) {
-            errorMessage = `Database Error: ${err.message}`;
-            if (err.details) errorMessage += `
-Details: ${err.details}`;
-            if (err.hint) errorMessage += `
-Hint: ${err.hint}`;
-        } else {
-            errorMessage = `An unexpected error object was caught. Full details:
-${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
-        }
-      } else {
-        errorMessage = `An unexpected error was caught: ${err}`;
-      }
-      
-      setError(`Failed to create the budget. Please see the details below:
-
-${errorMessage}`);
-
-    } finally {
+      setError('Failed to create new budget. Please try again.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="card">
-      <h2>Create a New Budget</h2>
-      <form onSubmit={handleSubmit}>
-        {error && <pre className="error-message">{error}</pre>}
-        <div className="form-group">
-          <label>Budget Name</label>
-          <input type="text" value={budgetName} onChange={(e) => setBudgetName(e.target.value)} required />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating Budget...' : 'Create Budget'}
-        </button>
-      </form>
+    <div className={styles.newBudgetPage}>
+      <div className="card">
+        <h1>Create New Budget</h1>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
+            <label htmlFor="budgetName">Budget Name</label>
+            <input
+              id="budgetName"
+              type="text"
+              value={budgetName}
+              onChange={(e) => setBudgetName(e.target.value)}
+              placeholder="e.g., Q1 Production Budget"
+              required
+            />
+          </div>
+          {error && <p className={styles.errorText}>{error}</p>}
+          <button type="submit" disabled={loading} className={styles.submitButton}>
+            {loading ? 'Creating...' : 'Create and Go to Budget'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
