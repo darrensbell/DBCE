@@ -28,8 +28,8 @@ function NewShowPage() {
       if (showErr) throw showErr;
       const newShowId = newShow.id;
 
-      // 2. Fetch all budget categories
-      const { data: categories, error: categoriesErr } = await supabase.from('dbce_budget_categories').select('id');
+      // 2. Fetch all standard categories
+      const { data: categories, error: categoriesErr } = await supabase.from('dbce_budget_categories').select('*');
       if (categoriesErr) throw categoriesErr;
 
       // 3. Create the budget for the new show
@@ -42,11 +42,24 @@ function NewShowPage() {
       if (budgetErr) throw budgetErr;
       const newBudgetId = budget.id;
 
-      // 4. Create line items for each category
-      const lineItems = categories.map(category => ({
-        budget_id: newBudgetId,
-        budget_category_id: category.id,
-      }));
+      // 4. Create line items for each category with all required fields and correct defaults
+      const lineItems = categories.map(category => {
+        const defaultRate = 0;
+        const defaultQuantity = 1;
+        const defaultNumberOfItems = 1;
+        
+        return {
+          budget_id: newBudgetId,
+          budget_category_id: category.id,
+          number_of_items: defaultNumberOfItems,
+          quantity: defaultQuantity,
+          rate_type: 'allowance', // Correct default as per user instruction
+          rate_gbp: defaultRate,
+          total_gbp: defaultNumberOfItems * defaultQuantity * defaultRate, // Correct calculation
+          date_added: new Date().toISOString(),
+          date_changed: new Date().toISOString(),
+        };
+      });
 
       const { error: lineItemsErr } = await supabase.from('dbce_budget_line_items').insert(lineItems);
       if (lineItemsErr) throw lineItemsErr;
@@ -59,24 +72,23 @@ function NewShowPage() {
       
       let errorMessage = 'An unknown error occurred.';
       if (typeof err === 'object' && err !== null) {
-        // Handle PostgrestError from Supabase, which has a specific structure
-        if (err.message && err.details) {
-            errorMessage = `Database Error: ${err.message}\nDetails: ${err.details}\nHint: ${err.hint || 'No hint provided.'}`;
-        }
-        // Handle a generic JavaScript Error object
-        else if (err.message) {
-            errorMessage = `Error: ${err.message}`;
-        }
-        // Fallback for any other type of object
-        else {
-            errorMessage = `An unexpected error object was caught. Full details:\n${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
+        if (err.message) {
+            errorMessage = `Database Error: ${err.message}`;
+            if (err.details) errorMessage += `
+Details: ${err.details}`;
+            if (err.hint) errorMessage += `
+Hint: ${err.hint}`;
+        } else {
+            errorMessage = `An unexpected error object was caught. Full details:
+${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
         }
       } else {
-        // Handle non-object errors (e.g., a string was thrown)
         errorMessage = `An unexpected error was caught: ${err}`;
       }
       
-      setError(`Failed to create the show. Please see the details below:\n\n${errorMessage}`);
+      setError(`Failed to create the show. Please see the details below:
+
+${errorMessage}`);
 
     } finally {
       setLoading(false);

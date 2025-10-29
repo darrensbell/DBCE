@@ -26,18 +26,31 @@ function NewBudgetPage() {
       if (budgetErr) throw budgetErr;
       const newBudgetId = newBudget.id;
 
-      // 2. Fetch all budget categories
+      // 2. Fetch all standard categories
       const { data: categories, error: categoriesErr } = await supabase
         .from('dbce_budget_categories')
-        .select('id');
+        .select('*');
 
       if (categoriesErr) throw categoriesErr;
 
-      // 3. Create line items for each category
-      const lineItems = categories.map(category => ({
-        budget_id: newBudgetId,
-        budget_category_id: category.id,
-      }));
+      // 3. Create line items for each category with all required fields and correct defaults
+      const lineItems = categories.map(category => {
+        const defaultRate = 0;
+        const defaultQuantity = 1;
+        const defaultNumberOfItems = 1;
+
+        return {
+            budget_id: newBudgetId,
+            budget_category_id: category.id,
+            number_of_items: defaultNumberOfItems,
+            quantity: defaultQuantity,
+            rate_type: 'allowance', // Correct default as per user instruction
+            rate_gbp: defaultRate,
+            total_gbp: defaultNumberOfItems * defaultQuantity * defaultRate, // Correct calculation
+            date_added: new Date().toISOString(),
+            date_changed: new Date().toISOString(),
+        };
+      });
 
       const { error: lineItemsErr } = await supabase
         .from('dbce_budget_line_items')
@@ -53,18 +66,23 @@ function NewBudgetPage() {
       
       let errorMessage = 'An unknown error occurred.';
       if (typeof err === 'object' && err !== null) {
-        if (err.message && err.details) {
-            errorMessage = `Database Error: ${err.message}\nDetails: ${err.details}\nHint: ${err.hint || 'No hint provided.'}`;
-        } else if (err.message) {
-            errorMessage = `Error: ${err.message}`;
+        if (err.message) {
+            errorMessage = `Database Error: ${err.message}`;
+            if (err.details) errorMessage += `
+Details: ${err.details}`;
+            if (err.hint) errorMessage += `
+Hint: ${err.hint}`;
         } else {
-            errorMessage = `An unexpected error object was caught. Full details:\n${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
+            errorMessage = `An unexpected error object was caught. Full details:
+${JSON.stringify(err, Object.getOwnPropertyNames(err), 2)}`;
         }
       } else {
         errorMessage = `An unexpected error was caught: ${err}`;
       }
       
-      setError(`Failed to create the budget. Please see the details below:\n\n${errorMessage}`);
+      setError(`Failed to create the budget. Please see the details below:
+
+${errorMessage}`);
 
     } finally {
       setLoading(false);
